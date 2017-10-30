@@ -9,6 +9,7 @@ import time
 # pushbutton connected to this GPIO pin, using pin 5 also has the benefit of
 # waking / powering up Raspberry Pi when button is pressed
 shutdownPin = 5
+ledPin = 29
 
 # if button pressed for at least this long then shut down. if less then reboot.
 shutdownMinSeconds = 3
@@ -18,6 +19,7 @@ debounceSeconds = 0.01
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(shutdownPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(ledPin, GPIO.OUT)
 
 buttonPressedTime = None
 
@@ -36,6 +38,7 @@ def buttonStateChanged(pin):
             buttonPressedTime = None
             if elapsed >= shutdownMinSeconds:
                 # button pressed for more than specified time, shutdown
+                GPIO.output(ledPin, True)
                 call(['shutdown', '-h', 'now'], shell=False)
             elif elapsed >= debounceSeconds:
                 # button pressed for a shorter time, reboot
